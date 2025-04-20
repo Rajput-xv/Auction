@@ -64,7 +64,7 @@ const loginUser = async (req, res) => {
 		});
 
 		res.cookie("jwt", token, {
-			httpOnly: true,
+			httpOnly: false,
 			expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
 			sameSite: "none",
 			secure: true,
@@ -101,7 +101,7 @@ const getProfile = async (req, res) => {
 const logoutUser = async (req, res) => {
 	try {
 		res.cookie("jwt", "", {
-			httpOnly: true,
+			httpOnly: false,
 			secure: true,
 			sameSite: "none",
 			expires: new Date(0),
