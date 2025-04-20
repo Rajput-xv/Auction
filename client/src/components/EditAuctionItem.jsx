@@ -14,7 +14,7 @@ const EditAuctionItem = () => {
 
 	useEffect(() => {
 		const fetchAuctionItem = async () => {
-			const res = await axios.get(`/api/auctions/${id}`);
+			const res = await axios.get(import.meta.env.VITE_API_URL+`/api/auctions/${id}`);
 			setAuctionItem(res.data);
 		};
 		fetchAuctionItem();
