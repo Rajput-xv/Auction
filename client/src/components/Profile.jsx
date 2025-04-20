@@ -26,9 +26,10 @@ function Profile() {
 				try {
 					const res = await axios.get(
 						import.meta.env.VITE_API_URL+"/api/users/profile",
-						{
-							headers: { Authorization: `Bearer ${token}` },
-						}
+						{ withCredentials: true }
+						// {
+						// 	headers: { Authorization: `Bearer ${token}` },
+						// }
 					);
 					setUser(res.data);
 				} catch (error) {
@@ -46,9 +47,10 @@ function Profile() {
 				try {
 					const res = await axios.get(
 						import.meta.env.VITE_API_URL+"/api/auctions/user",
-						{
-							headers: { Authorization: `Bearer ${token}` },
-						}
+						{ withCredentials: true }
+						// {
+						// 	headers: { Authorization: `Bearer ${token}` },
+						// }
 					);
 					setAuctions(res.data.auctionItems);
 					setTotalPagesAuctions(
