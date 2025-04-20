@@ -7,15 +7,9 @@ const ProtectedRoute = ({ component: Component, ...rest }) => {
     const { isLoggedIn } = useAuth();
     console.log("ProtectedRoute - isLoggedIn state:", isLoggedIn);
     
-    // Check both context state and cookie for robust protection
-    const token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("jwt="))
-        ?.split("=")[1];
-    
-    console.log("ProtectedRoute - cookie check:", !!token);
-
-    return (token || isLoggedIn) ? (
+    // If the context says we're logged in, we're logged in.
+    // Don't check the cookie directly since it's httpOnly
+    return isLoggedIn ? (
         <Component {...rest} />
     ) : (
         <Navigate to="/login" state={{ from: location }} replace />

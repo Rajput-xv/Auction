@@ -34,19 +34,8 @@ function Login() {
 		if (res.status === 200) {
 			console.log("Login successful, updating auth state");
 			login();
-			
-			// Force a cookie check after login
-			const checkCookie = () => {
-			const hasCookie = document.cookie.includes('jwt=');
-			console.log("Cookie check after login:", hasCookie);
-			if (hasCookie) {
-				navigate("/profile");
-			} else {
-				setTimeout(checkCookie, 100); // Retry if cookie not found
-			}
-			};
-			
-			checkCookie();
+			// Don't check for cookie, just navigate
+			navigate("/profile");
 		}
 		} catch (err) {
 		setError(err.response?.data?.message || "An error occurred");
