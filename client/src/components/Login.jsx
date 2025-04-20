@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../contexts";
 import { FiMail, FiLock } from "react-icons/fi";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
@@ -25,24 +25,34 @@ function Login() {
 		e.preventDefault();
 		setLoading(true);
 		try {
-			console.log("Attempting login...");
-			const res = await axios.post(
-				import.meta.env.VITE_API_URL+"/api/users/login",
-				{ email, password },
-				{ withCredentials: true }
-			);
-			if (res.status === 200) {
-				console.log("Login successful, updating auth state");
-				login();
-				console.log("Auth state updated, navigating to profile");
+		console.log("Attempting login...");
+		const res = await axios.post(
+			import.meta.env.VITE_API_URL+"/api/users/login",
+			{ email, password },
+			{ withCredentials: true }
+		);
+		if (res.status === 200) {
+			console.log("Login successful, updating auth state");
+			login();
+			
+			// Force a cookie check after login
+			const checkCookie = () => {
+			const hasCookie = document.cookie.includes('jwt=');
+			console.log("Cookie check after login:", hasCookie);
+			if (hasCookie) {
 				navigate("/profile");
-				console.log("Navigation called");
+			} else {
+				setTimeout(checkCookie, 100); // Retry if cookie not found
 			}
+			};
+			
+			checkCookie();
+		}
 		} catch (err) {
-			setError(err.response?.data?.message || "An error occurred");
-			console.error(err);
+		setError(err.response?.data?.message || "An error occurred");
+		console.error(err);
 		} finally {
-			setLoading(false);
+		setLoading(false);
 		}
 	};
 

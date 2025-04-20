@@ -25,18 +25,29 @@ function App() {
 		setIsLoggedIn(false);
 	};
 
-	const token = document.cookie
-		.split("; ")
-		.find((row) => row.startsWith("jwt="))
-		?.split("=")[1];
-
-	useEffect(() => {
-		if (token) {
-			login();
-		} else {
-			logout();
-		}
-	}, [token]);
+	// Replace lines 27-37 with this improved cookie detection
+const getTokenFromCookie = () => {
+	const cookies = document.cookie.split('; ');
+	const tokenCookie = cookies.find(row => row.startsWith('jwt='));
+	return tokenCookie ? tokenCookie.split('=')[1] : null;
+  };
+  
+  useEffect(() => {
+	const checkAuth = () => {
+	  const token = getTokenFromCookie();
+	  console.log("Auth check - token exists:", !!token);
+	  if (token) {
+		login();
+	  } else {
+		logout();
+	  }
+	};
+	
+	checkAuth();
+	// Check auth again whenever route changes
+	window.addEventListener('storage', checkAuth);
+	return () => window.removeEventListener('storage', checkAuth);
+  }, []);
 
 	return (
 		<AuthProvider value={{ isLoggedIn, login, logout }}>
