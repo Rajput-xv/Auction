@@ -1,8 +1,8 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// const target = "https://auction-system-server.onrender.com/api"; //  backend server URL
-const target = "http://localhost:5000/api"; //  backend server URL
+const target = "https://auction-8s0d.onrender.com/api"; //  backend server URL
+// const target = "http://localhost:5000/api"; //  backend server URL
 
 export default defineConfig({
 	plugins: [react()],

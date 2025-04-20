@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
 	cors({
-		origin: ["https://auction-system-client.vercel.app", "http://localhost:5173"],
+		origin: ["https://auction-lac.vercel.app/", "http://localhost:5173"],
 		methods: ["GET", "PUT", "POST", "DELETE"],
 		credentials: true,
 	})
