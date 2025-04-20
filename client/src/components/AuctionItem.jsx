@@ -25,7 +25,7 @@ function AuctionItem() {
 	useEffect(() => {
 		const fetchAuctionItem = async () => {
 			try {
-				const res = await axios.get(`/api/auctions/${id}`);
+				const res = await axios.get(import.meta.env.VITE_API_URL+`/api/auctions/${id}`);
 				setAuctionItem(res.data);
 			} catch (error) {
 				console.error("Error fetching auction item:", error);
@@ -40,7 +40,7 @@ function AuctionItem() {
 			if (token) {
 				try {
 					const res = await axios.get(
-						"/api/users/profile",
+						import.meta.env.VITE_API_URL+"/api/users/profile",
 						{
 							headers: { Authorization: `Bearer ${token}` },
 						}
@@ -54,7 +54,7 @@ function AuctionItem() {
 
 		const fetchWinner = async () => {
 			try {
-				const res = await axios.get(`/api/auctions/winner/${id}`);
+				const res = await axios.get(import.meta.env.VITE_API_URL+`/api/auctions/winner/${id}`);
 				setWinner(res.data.winner);
 			} catch (error) {
 				if (error.response.data.winner !== "") {
@@ -72,7 +72,7 @@ function AuctionItem() {
 		const fetchBids = async () => {
 			setLoadingBids(true);
 			try {
-				const res = await axios.get(`/api/bids/${id}`);
+				const res = await axios.get(import.meta.env.VITE_API_URL+`/api/bids/${id}`);
 				const sortedBids = res.data.sort(
 					(a, b) => b.bidAmount - a.bidAmount
 				);
@@ -121,7 +121,7 @@ function AuctionItem() {
 
 	const handleDelete = async () => {
 		try {
-			await axios.delete(`/api/auctions/${id}`);
+			await axios.delete(import.meta.env.VITE_API_URL+`/api/auctions/${id}`);
 			navigate("/auctions");
 		} catch (error) {
 			console.error("Error deleting auction item:", error);
