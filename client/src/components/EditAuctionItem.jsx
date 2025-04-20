@@ -30,7 +30,7 @@ const EditAuctionItem = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		await axios.put(`/api/auctions/${id}`, auctionItem);
+		await axios.put(import.meta.env.VITE_API_URL+`/api/auctions/${id}`, auctionItem);
 		navigate(`/auction/${id}`);
 	};
 
