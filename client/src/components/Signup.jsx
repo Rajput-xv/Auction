@@ -26,7 +26,7 @@ function Signup() {
 		setLoading(true);
 		try {
 			const res = await axios.post(
-				import.meta.env.VITE_API_URL+"/api/users/register",
+				"/api/users/register",
 				{ username, email, password, confirmPassword },
 				{ withCredentials: true }
 			);

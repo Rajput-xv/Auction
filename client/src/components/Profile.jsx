@@ -25,7 +25,7 @@ function Profile() {
 			if (token) {
 				try {
 					const res = await axios.get(
-						import.meta.env.VITE_API_URL+"/api/users/profile",
+						"/api/users/profile",
 						{
 							withCredentials: true,
 							headers: { Authorization: `Bearer ${token}` },
@@ -46,7 +46,7 @@ function Profile() {
 			if (token) {
 				try {
 					const res = await axios.get(
-						import.meta.env.VITE_API_URL+"/api/auctions/user",
+						"/api/auctions/user",
 						{
 							withCredentials: true,
 							headers: { Authorization: `Bearer ${token}` }
@@ -70,7 +70,7 @@ function Profile() {
 			if (token) {
 				try {
 					const res = await axios.get(
-						import.meta.env.VITE_API_URL+"/api/bids/user",
+						"/api/bids/user",
 						{
 							withCredentials: true,
 							headers: { Authorization: `Bearer ${token}` },
@@ -94,7 +94,7 @@ function Profile() {
 			if (token) {
 				try {
 					const res = await axios.post(
-						import.meta.env.VITE_API_URL+"/api/auctions/won",
+						"/api/auctions/won",
 						{},
 						{
 							withCredentials: true,
