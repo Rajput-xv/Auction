@@ -29,7 +29,7 @@ const Home = () => {
 					fill="url(#gradient1)"
 				/>
 			</svg>
-			BidBud
+			Bid
 		</div>
 	);
 
