@@ -13,24 +13,30 @@ function Login() {
 	const navigate = useNavigate();
 	const { isLoggedIn, login } = useAuth();
 
-	// useEffect(() => {
-	// 	if (isLoggedIn) {
-	// 		navigate("/profile");
-	// 	}
-	// }, [isLoggedIn, navigate]);
+	useEffect(() => {
+		console.log("Login component mounted, isLoggedIn:", isLoggedIn);
+		if (isLoggedIn) {
+			console.log("User is logged in, navigating to profile");
+			navigate("/profile");
+		}
+	}, [isLoggedIn, navigate]);
 
 	const handleLogin = async (e) => {
 		e.preventDefault();
 		setLoading(true);
 		try {
+			console.log("Attempting login...");
 			const res = await axios.post(
 				import.meta.env.VITE_API_URL+"/api/users/login",
 				{ email, password },
 				{ withCredentials: true }
 			);
 			if (res.status === 200) {
+				console.log("Login successful, updating auth state");
 				login();
+				console.log("Auth state updated, navigating to profile");
 				navigate("/profile");
+				console.log("Navigation called");
 			}
 		} catch (err) {
 			setError(err.response?.data?.message || "An error occurred");
