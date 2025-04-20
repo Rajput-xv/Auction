@@ -69,38 +69,38 @@ const getBidHistory = async (req, res) => {
 };
 
 const getBidsByUser = async (req, res) => {
-	try {
-		const token = req.headers.authorization.split(" ")[1];
-
-		const { id } = jwt.decode(token, process.env.JWT_SECRET, (err) => {
-			if (err) {
-				console.log(err);
-				return res.status(500).json({ message: err.message });
-			}
-		});
-
-		let bids = await Bid.find({ userId: id });
-		bids = await Promise.all(
-			bids.map(async (bid) => {
-				const auctionItem = await AuctionItem.findById(
-					bid.auctionItemId
-				);
-				const bidObject = bid.toObject();
-				delete bidObject.auctionItemId;
-				return {
-					...bidObject,
-					auctionItem,
-				};
-			})
-		);
-
-		res.status(200).json({
-			bids,
-		});
-	} catch (error) {
-		console.log(error.message);
-		res.status(500).json({ message: error.message });
-	}
+    try {
+        // Make sure user ID exists
+        const userId = req.user.id;
+        if (!userId) {
+            return res.status(400).json({ message: "User ID not found" });
+        }
+        
+        // Find all bids by this user and populate auction item details
+        const bids = await Bid.find({ userId })
+            .populate({
+                path: 'auctionItemId',
+                select: 'title description startingBid endDate'
+            })
+            .sort({ createdAt: -1 });
+            
+        // Add error checking for bids
+        if (!bids) {
+            return res.status(200).json({ bids: [] });
+        }
+            
+        res.status(200).json({
+            bids: bids.map(bid => ({
+                _id: bid._id,
+                bidAmount: bid.bidAmount,
+                createdAt: bid.createdAt,
+                auctionItem: bid.auctionItemId || {} // Add fallback if population fails
+            }))
+        });
+    } catch (error) {
+        console.error("Error fetching user bids:", error);
+        res.status(500).json({ message: error.message });
+    }
 };
 
 module.exports = {

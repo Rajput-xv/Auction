@@ -26,7 +26,6 @@ function Profile() {
 				try {
 					const res = await axios.get(
 						"/api/users/profile",
-						{},
 						{
 							headers: { Authorization: `Bearer ${token}` },
 						}
@@ -47,7 +46,6 @@ function Profile() {
 				try {
 					const res = await axios.get(
 						"/api/auctions/user",
-						{},
 						{
 							headers: { Authorization: `Bearer ${token}` },
 						}
@@ -71,7 +69,6 @@ function Profile() {
 				try {
 					const res = await axios.get(
 						"/api/bids/user",
-						{},
 						{
 							headers: { Authorization: `Bearer ${token}` },
 						}

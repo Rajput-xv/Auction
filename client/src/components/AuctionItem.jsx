@@ -41,7 +41,6 @@ function AuctionItem() {
 				try {
 					const res = await axios.get(
 						"/api/users/profile",
-						{},
 						{
 							headers: { Authorization: `Bearer ${token}` },
 						}
