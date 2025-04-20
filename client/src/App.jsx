@@ -18,74 +18,67 @@ function App() {
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 	const login = () => {
+		console.log("Setting isLoggedIn to true");
 		setIsLoggedIn(true);
+		// Trigger storage event to notify other tabs
+		localStorage.setItem('auth-state', Date.now().toString());
 	};
 
 	const logout = () => {
 		setIsLoggedIn(false);
 	};
 
-	// Replace lines 27-37 with this improved cookie detection
-const getTokenFromCookie = () => {
-	const cookies = document.cookie.split('; ');
-	const tokenCookie = cookies.find(row => row.startsWith('jwt='));
-	return tokenCookie ? tokenCookie.split('=')[1] : null;
-  };
-  
-  useEffect(() => {
-	const checkAuth = () => {
-	  const token = getTokenFromCookie();
-	  console.log("Auth check - token exists:", !!token);
-	  if (token) {
-		login();
-	  } else {
-		logout();
-	  }
+	const getTokenFromCookie = () => {
+		const cookies = document.cookie.split('; ');
+		const tokenCookie = cookies.find(row => row.startsWith('jwt='));
+		return tokenCookie ? tokenCookie.split('=')[1] : null;
 	};
 	
-	checkAuth();
-	// Check auth again whenever route changes
-	window.addEventListener('storage', checkAuth);
-	return () => window.removeEventListener('storage', checkAuth);
-  }, []);
+	useEffect(() => {
+		const checkAuth = () => {
+		const token = getTokenFromCookie();
+		console.log("Auth check - token exists:", !!token);
+		if (token) {
+			login();
+		} else {
+			logout();
+		}
+		};
+		
+		checkAuth();
+		// Check auth again whenever route changes
+		window.addEventListener('storage', checkAuth);
+		return () => window.removeEventListener('storage', checkAuth);
+	}, []);
 
 	return (
 		<AuthProvider value={{ isLoggedIn, login, logout }}>
 			<Router>
 				<NavBar />
-				<div className="container mx-auto">
-					<Routes>
-						<Route path="/" element={<Home />} />
-						<Route path="/signup" element={<Signup />} />
-						<Route path="/login" element={<Login />} />
-						<Route
-							path="/profile"
-							element={<ProtectedRoute component={Profile} />}
-						/>
-						<Route path="/logout" element={<Logout />} />
-						<Route path="/auctions" element={<AuctionList />} />
-						<Route
-							path="/auction/:id"
-							element={<ProtectedRoute component={AuctionItem} />}
-						/>
-						<Route
-							path="/auction/create"
-							element={
-								<ProtectedRoute component={CreateAuctionItem} />
-							}
-						/>
-						<Route
-							path="/auction/edit/:id"
-							element={
-								<ProtectedRoute component={EditAuctionItem} />
-							}
-						/>
-						<Route
-							path="/auction/bid/:id"
-							element={<ProtectedRoute component={BidForm} />}
-						/>
-					</Routes>
-				</div>
+				<Routes>
+					<Route path="/" element={<Home />} />
+					<Route path="/auctions" element={<AuctionList />} />
+					<Route path="/auctions/:id" element={<AuctionItem />} />
+					<Route path="/signup" element={<Signup />} />
+					<Route path="/login" element={<Login />} />
+					<Route 
+						path="/profile" 
+						element={<ProtectedRoute component={Profile} />} 
+					/>
+					<Route
+						path="/auctions/create"
+						element={<ProtectedRoute component={CreateAuctionItem} />}
+					/>
+					<Route
+						path="/auctions/:id/edit"
+						element={<ProtectedRoute component={EditAuctionItem} />}
+					/>
+					<Route
+						path="/auctions/:id/bid"
+						element={<ProtectedRoute component={BidForm} />}
+					/>
+					<Route path="/logout" element={<Logout />} />
+				</Routes>
 			</Router>
 		</AuthProvider>
 	);
