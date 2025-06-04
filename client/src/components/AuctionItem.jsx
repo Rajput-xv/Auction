@@ -239,7 +239,7 @@ function AuctionItem() {
 						>
 							Previous
 						</button>
-						<span className="text-gray-400 ext-center ">
+						<span className="text-gray-400 text-center ">
 							Page {currentPage} of{" "}
 							{totalPages === 0 ? 1 : totalPages}
 						</span>
