@@ -8,12 +8,29 @@ const createAuctionItem = async (req, res) => {
 	const userId = req.user.id;
 
 	try {
-		const newDate = new Date(new Date(endDate).getTime());
+		// Input validation
+		if (!title || !description || !startingBid || !endDate) {
+			return res.status(400).json({ message: "All fields are required" });
+		}
+
+		if (startingBid <= 0) {
+			return res.status(400).json({ message: "Starting bid must be greater than 0" });
+		}
+
+		const auctionEndDate = new Date(endDate);
+		if (auctionEndDate <= new Date()) {
+			return res.status(400).json({ message: "End date must be in the future" });
+		}
+
+		// Sanitize inputs
+		const sanitizedTitle = title.trim();
+		const sanitizedDescription = description.trim();
+
 		const auctionItem = await AuctionItem.create({
-			title,
-			description,
-			startingBid,
-			endDate: newDate,
+			title: sanitizedTitle,
+			description: sanitizedDescription,
+			startingBid: Number(startingBid),
+			endDate: auctionEndDate,
 			createdBy: userId,
 		});
 
@@ -47,19 +64,29 @@ const getAuctionItemById = async (req, res) => {
 
 const getAuctionItemsByUser = async (req, res) => {
 	try {
+		// Check if authorization header exists
+		if (!req.headers.authorization || !req.headers.authorization.startsWith("Bearer ")) {
+			return res.status(401).json({ message: "Authorization header missing or invalid" });
+		}
+
 		const token = req.headers.authorization.split(" ")[1];
-		const { id } = jwt.decode(token, process.env.JWT_SECRET, (err) => {
-			if (err) {
-				console.log(err);
-				return res.status(500).json({ message: err.message });
-			}
-		});
+		
+		// Use jwt.verify instead of jwt.decode for security
+		const decoded = jwt.verify(token, process.env.JWT_SECRET);
+		const id = decoded.id;
+		
 		const auctionItems = await AuctionItem.find({ createdBy: id });
 		res.status(200).json({
 			auctionItems,
 		});
 	} catch (error) {
 		console.log(error.message);
+		if (error.name === 'JsonWebTokenError') {
+			return res.status(401).json({ message: "Invalid token" });
+		}
+		if (error.name === 'TokenExpiredError') {
+			return res.status(401).json({ message: "Token expired" });
+		}
 		res.status(500).json({ message: error.message });
 	}
 };

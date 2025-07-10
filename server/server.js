@@ -10,7 +10,11 @@ connectDB();
 
 const app = express();
 app.use(express.json());
+
+// Cookie parser with security options
 app.use(cookieParser());
+
+// CORS configuration
 app.use(
     cors({
         origin: ["https://auction-lac.vercel.app", "http://localhost:5173"],
@@ -18,6 +22,14 @@ app.use(
         credentials: true,
     })
 );
+
+// Security headers
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    next();
+});
 
 app.use(router);
 app.use("/api/users", require("./routes/userRoutes"));

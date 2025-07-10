@@ -63,11 +63,12 @@ const loginUser = async (req, res) => {
 			expiresIn: "1d",
 		});
 
+		// Set secure cookie with proper options
 		res.cookie("jwt", token, {
-			httpOnly: false,
-			expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-			sameSite: "none",
-			secure: true,
+			httpOnly: process.env.NODE_ENV === 'production', // httpOnly in production
+			expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+			secure: process.env.NODE_ENV === 'production', // secure in production
 		});
 
 		res.status(200).json({
