@@ -90,7 +90,7 @@ function AuctionList() {
 						className="border border-gray-700 rounded-lg p-4 bg-gray-800 shadow-md"
 					>
 						<Link
-							to={`/auction/${item._id}`}
+							to={`/auctions/${item._id}`}
 							className="text-indigo-400 hover:underline text-lg font-semibold"
 						>
 							{item.title}

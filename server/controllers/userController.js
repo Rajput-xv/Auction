@@ -102,9 +102,9 @@ const getProfile = async (req, res) => {
 const logoutUser = async (req, res) => {
 	try {
 		res.cookie("jwt", "", {
-			httpOnly: false,
-			secure: true,
-			sameSite: "none",
+			httpOnly: process.env.NODE_ENV === 'production',
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
 			expires: new Date(0),
 		});
 		res.status(200).json({ message: "Logged out successfully" });
