@@ -17,7 +17,9 @@ app.use(cookieParser());
 // CORS configuration
 app.use(
     cors({
-        origin: ["https://auction-lac.vercel.app", "http://localhost:5173"],
+        origin: process.env.NODE_ENV === 'production' 
+            ? ["https://auction-lac.vercel.app"] 
+            : ["https://auction-lac.vercel.app", "http://localhost:5173"],
         methods: ["GET", "PUT", "POST", "DELETE"],
         credentials: true,
     })
