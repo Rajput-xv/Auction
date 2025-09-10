@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts";
 import { FiMail, FiLock } from "react-icons/fi";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import api from "../utils/axiosConfig";
 
 function Login() {
 	const [email, setEmail] = useState("");
@@ -23,10 +23,9 @@ function Login() {
 		e.preventDefault();
 		setLoading(true);
 		try {
-		const res = await axios.post(
-			import.meta.env.VITE_API_URL+"/api/users/login",
-			{ email, password },
-			{ withCredentials: true }
+		const res = await api.post(
+			"/api/users/login",
+			{ email, password }
 		);
 		if (res.status === 200) {
 			// The cookie is set by the server
@@ -35,7 +34,7 @@ function Login() {
 		}
 		} catch (err) {
 		setError(err.response?.data?.message || "An error occurred");
-		console.error(err);
+		console.error("Login error:", err.response?.data?.message || err.message);
 		} finally {
 		setLoading(false);
 		}

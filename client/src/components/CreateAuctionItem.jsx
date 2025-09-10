@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../utils/axiosConfig";
 
 const CreateAuctionItem = () => {
 	const [title, setTitle] = useState("");
@@ -12,24 +12,37 @@ const CreateAuctionItem = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		const token = document.cookie
-			.split("; ")
-			.find((row) => row.startsWith("jwt="))
-			?.split("=")[1];
-		if (token) {
-			try {
-				await axios.post(
-					import.meta.env.VITE_API_URL+"/api/auctions",
-					{ title, description, startingBid, endDate },
-					{
-						headers: { Authorization: `Bearer ${token}` },
-					}
-				);
-				navigate("/profile");
-			} catch (err) {
+		
+		// Client-side validation
+		if (!title.trim() || !description.trim() || !startingBid || !endDate) {
+			setError("All fields are required");
+			return;
+		}
+		
+		if (parseFloat(startingBid) <= 0) {
+			setError("Starting bid must be greater than 0");
+			return;
+		}
+		
+		const auctionEndDate = new Date(endDate);
+		if (auctionEndDate <= new Date()) {
+			setError("End date must be in the future");
+			return;
+		}
+		
+		try {
+			await api.post(
+				"/api/auctions",
+				{ title, description, startingBid, endDate }
+			);
+			navigate("/profile");
+		} catch (err) {
+			if (err.response?.status === 401) {
+				setError("You must be logged in to create an auction. Please log in and try again.");
+			} else {
 				setError("Failed to create auction. Please try again.");
-				console.error(err);
 			}
+			console.error("Error creating auction:", err.response?.data?.message || err.message);
 		}
 	};
 

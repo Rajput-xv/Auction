@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
+import api from "../utils/axiosConfig";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -10,13 +10,19 @@ function AuctionList() {
 	const [searchResults, setSearchResults] = useState([]);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(0);
+	const [error, setError] = useState("");
 
 	useEffect(() => {
 		const fetchAuctionItems = async () => {
-			const res = await axios.get(import.meta.env.VITE_API_URL+"/api/auctions");
-			setAuctionItems(res.data);
-			setSearchResults(res.data);
-			setTotalPages(Math.ceil(res.data.length / ITEMS_PER_PAGE));
+			try {
+				const res = await api.get("/api/auctions");
+				setAuctionItems(res.data);
+				setSearchResults(res.data);
+				setTotalPages(Math.ceil(res.data.length / ITEMS_PER_PAGE));
+			} catch (err) {
+				setError("Failed to load auction items. Please try again.");
+				console.error("Error fetching auction items:", err.response?.data?.message || err.message);
+			}
 		};
 		fetchAuctionItems();
 	}, []);
@@ -74,6 +80,7 @@ function AuctionList() {
 	return (
 		<div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-900 text-white rounded-lg shadow-lg">
 			<h2 className="text-4xl font-bold mb-6">Auction Items</h2>
+			{error && <div className="p-3 mb-4 text-red-700 bg-red-100 border border-red-200 rounded-lg">{error}</div>}
 			<div className="mb-6 flex flex-col gap-4">
 				<input
 					type="text"

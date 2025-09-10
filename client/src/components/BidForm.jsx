@@ -1,18 +1,24 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import api from "../utils/axiosConfig";
 
 const BidForm = () => {
 	const { id } = useParams();
 	const [auctionItem, setAuctionItem] = useState(null);
 	const [bidAmount, setBidAmount] = useState("");
+	const [error, setError] = useState("");
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		const fetchAuctionItem = async () => {
-			const res = await axios.get(import.meta.env.VITE_API_URL+`/api/auctions/${id}`);
-			setAuctionItem(res.data);
-			setBidAmount(res.data.startingBid || "");
+			try {
+				const res = await api.get(`/api/auctions/${id}`);
+				setAuctionItem(res.data);
+				setBidAmount(res.data.startingBid || "");
+			} catch (err) {
+				setError("Failed to load auction item. Please try again.");
+				console.error("Error fetching auction item:", err.response?.data?.message || err.message);
+			}
 		};
 
 		fetchAuctionItem();
@@ -21,18 +27,18 @@ const BidForm = () => {
 	const handleBid = async (e) => {
 		e.preventDefault();
 		try {
-			const token = document.cookie
-				.split("; ")
-				.find((row) => row.startsWith("jwt="))
-				?.split("=")[1];
-			await axios.post(
-				import.meta.env.VITE_API_URL+"/api/bids",
-				{ auctionItemId: id, bidAmount },
-				{ headers: { Authorization: `Bearer ${token}` } }
+			await api.post(
+				"/api/bids",
+				{ auctionItemId: id, bidAmount }
 			);
 			navigate(`/auctions/${id}`);
 		} catch (err) {
-			console.error(err);
+			if (err.response?.status === 401) {
+				setError("You must be logged in to place a bid. Please log in and try again.");
+			} else {
+				setError(err.response?.data?.message || "Failed to place bid. Please try again.");
+			}
+			console.error("Error placing bid:", err.response?.data?.message || err.message);
 		}
 	};
 
@@ -43,6 +49,7 @@ const BidForm = () => {
 			<h2 className="mb-6 text-3xl font-extrabold text-gray-800">
 				Place a Bid
 			</h2>
+			{error && <div className="p-3 mb-4 text-red-700 bg-red-100 border border-red-200 rounded-lg">{error}</div>}
 			<div className="p-4 mb-6 bg-gray-100 border border-gray-200 rounded-lg">
 				<p className="text-lg font-medium text-gray-700">
 					Starting Bid Amount:

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
+import api from "../utils/axiosConfig";
 
 const ITEMS_PER_PAGE = 3;
 
@@ -15,72 +15,55 @@ function Profile() {
 	const [totalPagesAuctions, setTotalPagesAuctions] = useState(1);
 	const [totalPagesBids, setTotalPagesBids] = useState(1);
 	const [totalPagesWon, setTotalPagesWon] = useState(1);
+	const [error, setError] = useState("");
 
 	useEffect(() => {
 		const fetchUser = async () => {
 			try {
-				// Let the browser automatically send the cookie
-				const res = await axios.get(
-					import.meta.env.VITE_API_URL+"/api/users/profile",
-					{
-						withCredentials: true
-					}
-				);
+				const res = await api.get("/api/users/profile");
 				setUser(res.data);
 			} catch (error) {
 				console.error("Error fetching user profile:", error);
+				setError("Failed to load user profile");
 			}
 		};
 
 		const fetchAuctions = async () => {
 			try {
-				const res = await axios.get(
-					import.meta.env.VITE_API_URL+"/api/auctions/user",
-					{
-						withCredentials: true
-					}
-				);
+				const res = await api.get("/api/auctions/user");
 				setAuctions(res.data.auctionItems);
 				setTotalPagesAuctions(
 					Math.ceil(res.data.auctionItems.length / ITEMS_PER_PAGE)
 				);
 			} catch (error) {
 				console.error("Error fetching auctions:", error);
+				setError("Failed to load your auctions");
 			}
 		};
 
 		const fetchBids = async () => {
 			try {
-				const res = await axios.get(
-					import.meta.env.VITE_API_URL+"/api/bids/user",
-					{
-						withCredentials: true
-					}
-				);
+				const res = await api.get("/api/bids/user");
 				setBids(res.data.bids);
 				setTotalPagesBids(
 					Math.ceil(res.data.bids.length / ITEMS_PER_PAGE)
 				);
 			} catch (error) {
 				console.error("Error fetching bids:", error);
+				setError("Failed to load your bids");
 			}
 		};
 
 		const fetchWonAuctions = async () => {
 			try {
-				const res = await axios.post(
-					import.meta.env.VITE_API_URL+"/api/auctions/won",
-					{},
-					{
-						withCredentials: true
-					}
-				);
+				const res = await api.post("/api/auctions/won", {});
 				setWonAuctions(res.data.wonAuctions);
 				setTotalPagesWon(
 					Math.ceil(res.data.wonAuctions.length / ITEMS_PER_PAGE)
 				);
 			} catch (error) {
 				console.error("Error fetching won auctions:", error);
+				setError("Failed to load won auctions");
 			}
 		};
 
@@ -133,6 +116,7 @@ function Profile() {
 						<h2 className="mb-6 text-3xl font-extrabold text-white">
 							Profile
 						</h2>
+						{error && <div className="p-3 mb-4 text-red-700 bg-red-100 border border-red-200 rounded-lg">{error}</div>}
 						<div className="p-6 mb-8 bg-gray-700 rounded-lg">
 							<p className="mb-2 text-lg">
 								<span className="font-semibold text-purple-400">

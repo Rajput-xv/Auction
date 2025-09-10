@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { FiUser, FiMail, FiLock } from "react-icons/fi";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import api from "../utils/axiosConfig";
 
 function Signup() {
 	const [username, setUsername] = useState("");
@@ -23,19 +23,25 @@ function Signup() {
 
 	const handleSignup = async (e) => {
 		e.preventDefault();
+		
+		// Client-side validation
+		if (password !== confirmPassword) {
+			setError("Passwords do not match");
+			return;
+		}
+		
 		setLoading(true);
 		try {
-			const res = await axios.post(
-				import.meta.env.VITE_API_URL+"/api/users/register",
-				{ username, email, password, confirmPassword },
-				{ withCredentials: true }
+			const res = await api.post(
+				"/api/users/register",
+				{ username, email, password, confirmPassword }
 			);
 			if (res.status === 201) {
 				navigate("/login");
 			}
 		} catch (err) {
 			setError(err.response?.data?.message || "An error occurred");
-			console.error(err);
+			console.error("Signup error:", err.response?.data?.message || err.message);
 		} finally {
 			setLoading(false);
 		}

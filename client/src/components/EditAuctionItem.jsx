@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import api from "../utils/axiosConfig";
 
 const EditAuctionItem = () => {
 	const { id } = useParams();
@@ -10,12 +10,18 @@ const EditAuctionItem = () => {
 		startingBid: "",
 		endDate: "",
 	});
+	const [error, setError] = useState("");
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		const fetchAuctionItem = async () => {
-			const res = await axios.get(import.meta.env.VITE_API_URL+`/api/auctions/${id}`);
-			setAuctionItem(res.data);
+			try {
+				const res = await api.get(`/api/auctions/${id}`);
+				setAuctionItem(res.data);
+			} catch (err) {
+				setError("Failed to load auction item. Please try again.");
+				console.error("Error fetching auction item:", err.response?.data?.message || err.message);
+			}
 		};
 		fetchAuctionItem();
 	}, [id]);
@@ -30,13 +36,19 @@ const EditAuctionItem = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		await axios.put(import.meta.env.VITE_API_URL+`/api/auctions/${id}`, auctionItem);
-		navigate(`/auctions/${id}`);
+		try {
+			await api.put(`/api/auctions/${id}`, auctionItem);
+			navigate(`/auctions/${id}`);
+		} catch (err) {
+			setError("Failed to update auction. Please try again.");
+			console.error("Error updating auction:", err.response?.data?.message || err.message);
+		}
 	};
 
 	return (
 		<div className="max-w-4xl mx-auto mt-10 p-8 bg-gray-900 text-white rounded-lg shadow-lg">
 			<h2 className="text-3xl font-bold mb-6">Edit Auction Item</h2>
+			{error && <p className="text-red-500 mb-4">{error}</p>}
 			<form onSubmit={handleSubmit} className="space-y-6">
 				<div>
 					<label htmlFor="title" className="block text-lg mb-2">

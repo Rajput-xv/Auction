@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import api from "../utils/axiosConfig";
 import "./AuctionItem.css";
 
 const ITEMS_PER_PAGE = 10;
@@ -20,45 +20,36 @@ function AuctionItem() {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(0);
 	const [loadingBids, setLoadingBids] = useState(true);
+	const [error, setError] = useState("");
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		const fetchAuctionItem = async () => {
 			try {
-				const res = await axios.get(import.meta.env.VITE_API_URL+`/api/auctions/${id}`);
+				const res = await api.get(`/api/auctions/${id}`);
 				setAuctionItem(res.data);
 			} catch (error) {
-				console.error("Error fetching auction item:", error);
+				setError("Failed to load auction item. Please try again.");
+				console.error("Error fetching auction item:", error.response?.data?.message || error.message);
 			}
 		};
 
 		const fetchUser = async () => {
-			const token = document.cookie
-				.split("; ")
-				.find((row) => row.startsWith("jwt="))
-				?.split("=")[1];
-			if (token) {
-				try {
-					const res = await axios.get(
-						import.meta.env.VITE_API_URL+"/api/users/profile",
-						{
-							headers: { Authorization: `Bearer ${token}` },
-						}
-					);
-					setUser(res.data);
-				} catch (error) {
-					console.error("Error fetching user profile:", error);
-				}
+			try {
+				const res = await api.get("/api/users/profile");
+				setUser(res.data);
+			} catch (error) {
+				console.error("Error fetching user profile:", error.response?.data?.message || error.message);
 			}
 		};
 
 		const fetchWinner = async () => {
 			try {
-				const res = await axios.get(import.meta.env.VITE_API_URL+`/api/auctions/winner/${id}`);
+				const res = await api.get(`/api/auctions/winner/${id}`);
 				setWinner(res.data.winner);
 			} catch (error) {
-				if (error.response.data.winner !== "") {
-					console.error("Error fetching auction winner:", error);
+				if (error.response?.data?.winner !== "") {
+					console.error("Error fetching auction winner:", error.response?.data?.message || error.message);
 				}
 			}
 		};
@@ -72,7 +63,7 @@ function AuctionItem() {
 		const fetchBids = async () => {
 			setLoadingBids(true);
 			try {
-				const res = await axios.get(import.meta.env.VITE_API_URL+`/api/bids/${id}`);
+				const res = await api.get(`/api/bids/${id}`);
 				const sortedBids = res.data.sort(
 					(a, b) => b.bidAmount - a.bidAmount
 				);
@@ -81,7 +72,8 @@ function AuctionItem() {
 					Math.ceil(sortedBids.length / ITEMS_PER_PAGE) || 0
 				);
 			} catch (error) {
-				console.error("Error fetching bids:", error);
+				setError("Failed to load bids. Please try again.");
+				console.error("Error fetching bids:", error.response?.data?.message || error.message);
 			} finally {
 				setLoadingBids(false);
 			}
@@ -121,10 +113,11 @@ function AuctionItem() {
 
 	const handleDelete = async () => {
 		try {
-			await axios.delete(import.meta.env.VITE_API_URL+`/api/auctions/${id}`);
+			await api.delete(`/api/auctions/${id}`);
 			navigate("/auctions");
 		} catch (error) {
-			console.error("Error deleting auction item:", error);
+			setError("Failed to delete auction item. Please try again.");
+			console.error("Error deleting auction item:", error.response?.data?.message || error.message);
 		}
 	};
 
@@ -153,6 +146,7 @@ function AuctionItem() {
 	return (
 		<div className="max-w-4xl p-8 mx-auto mt-10 text-white bg-gray-900 rounded-lg shadow-lg">
 			<h2 className="mb-4 text-4xl font-bold">{auctionItem.title}</h2>
+			{error && <div className="p-3 mb-4 text-red-700 bg-red-100 border border-red-200 rounded-lg">{error}</div>}
 			<p className="mb-4 text-lg">{auctionItem.description}</p>
 			<p className="mb-4 text-lg">
 				Starting Bid:{" "}
