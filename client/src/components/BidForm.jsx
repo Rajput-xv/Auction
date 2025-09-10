@@ -30,7 +30,7 @@ const BidForm = () => {
 				{ auctionItemId: id, bidAmount },
 				{ headers: { Authorization: `Bearer ${token}` } }
 			);
-			navigate(`/auction/${id}`);
+			navigate(`/auctions/${id}`);
 		} catch (err) {
 			console.error(err);
 		}

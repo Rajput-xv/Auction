@@ -153,7 +153,7 @@ function Profile() {
 								Your Auctions 🏛️
 							</h2>
 							<Link
-								to="/auction/create"
+								to="/auctions/create"
 								className="inline-block px-6 py-3 text-lg font-semibold text-white transition-all duration-300 transform rounded-full bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 hover:shadow-lg hover:-translate-y-1"
 							>
 								Create Auction ➕
@@ -193,7 +193,7 @@ function Profile() {
 												</span>
 											</p>
 											<Link
-												to={`/auction/${auction._id}`}
+												to={`/auctions/${auction._id}`}
 												className="inline-block px-6 py-3 text-white transition-all duration-300 transform rounded-full bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 hover:shadow-md hover:-translate-y-1"
 											>
 												View Auction 🔍
@@ -296,7 +296,7 @@ function Profile() {
 													</span>
 												</p>
 												<Link
-													to={`/auction/${bid.auctionItem._id}`}
+													to={`/auctions/${bid.auctionItem._id}`}
 													className="inline-block px-6 py-3 text-white transition-all duration-300 transform rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 hover:shadow-md hover:-translate-y-1"
 												>
 													View Auction 🔍
@@ -394,7 +394,7 @@ function Profile() {
 													</span>
 												</p>
 												<Link
-													to={`/auction/${auction.auctionId}`}
+													to={`/auctions/${auction.auctionId}`}
 													className="inline-block px-6 py-3 text-lg font-semibold text-white transition-all duration-300 transform rounded-full bg-gradient-to-r from-yellow-400 to-red-500 hover:from-yellow-500 hover:to-red-600 hover:shadow-md hover:-translate-y-1"
 												>
 													View Your Auction Item 🎉
