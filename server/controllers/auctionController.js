@@ -64,29 +64,15 @@ const getAuctionItemById = async (req, res) => {
 
 const getAuctionItemsByUser = async (req, res) => {
 	try {
-		// Check if authorization header exists
-		if (!req.headers.authorization || !req.headers.authorization.startsWith("Bearer ")) {
-			return res.status(401).json({ message: "Authorization header missing or invalid" });
-		}
-
-		const token = req.headers.authorization.split(" ")[1];
+		// The user is already attached to the request by the authMiddleware
+		const userId = req.user.id;
 		
-		// Use jwt.verify instead of jwt.decode for security
-		const decoded = jwt.verify(token, process.env.JWT_SECRET);
-		const id = decoded.id;
-		
-		const auctionItems = await AuctionItem.find({ createdBy: id });
+		const auctionItems = await AuctionItem.find({ createdBy: userId });
 		res.status(200).json({
 			auctionItems,
 		});
 	} catch (error) {
-		console.log(error.message);
-		if (error.name === 'JsonWebTokenError') {
-			return res.status(401).json({ message: "Invalid token" });
-		}
-		if (error.name === 'TokenExpiredError') {
-			return res.status(401).json({ message: "Token expired" });
-		}
+		console.log("Error in getAuctionItemsByUser:", error.message);
 		res.status(500).json({ message: error.message });
 	}
 };
@@ -194,11 +180,10 @@ const getAuctionWinner = async (req, res) => {
 
 const getAuctionsWonByUser = async (req, res) => {
 	try {
-		const token = req.headers.authorization.split(" ")[1];
-		const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-		const { id } = decodedToken;
+		// The user is already attached to the request by the authMiddleware
+		const userId = req.user.id;
 
-		const bidsByUser = await Bid.find({ userId: id });
+		const bidsByUser = await Bid.find({ userId });
 		const auctionIds = bidsByUser.map((bid) => bid.auctionItemId);
 
 		const uniqueAuctionIds = [...new Set(auctionIds)];
@@ -208,16 +193,28 @@ const getAuctionsWonByUser = async (req, res) => {
 		for (let i = 0; i < uniqueAuctionIds.length; i++) {
 			const auctionItemId = uniqueAuctionIds[i];
 			const bids = await Bid.find({ auctionItemId });
+			
+			// Check if bids array is empty
+			if (!bids || bids.length === 0) {
+				continue;
+			}
+			
 			let winningBid = bids.reduce(
 				(max, bid) => (bid.bidAmount > max.bidAmount ? bid : max),
 				bids[0]
 			);
 
 			const auctionItem = await AuctionItem.findById(auctionItemId);
+			
+			// Check if auction item exists
+			if (!auctionItem) {
+				continue;
+			}
+			
 			const isAuctionEnded =
 				new Date(auctionItem.endDate) <= new Date(Date.now());
 
-			if (isAuctionEnded && winningBid.userId.toString() === id) {
+			if (isAuctionEnded && winningBid.userId.toString() === userId) {
 				wonAuctions.push({
 					auctionId: auctionItemId,
 					title: auctionItem.title,
@@ -229,7 +226,7 @@ const getAuctionsWonByUser = async (req, res) => {
 		}
 		res.status(200).json({ wonAuctions });
 	} catch (error) {
-		console.log(error.message);
+		console.log("Error in getAuctionsWonByUser:", error.message);
 		res.status(500).json({ message: error.message });
 	}
 };
