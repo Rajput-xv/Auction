@@ -14,9 +14,7 @@ function Login() {
 	const { isLoggedIn, login } = useAuth();
 
 	useEffect(() => {
-		console.log("Login component mounted, isLoggedIn:", isLoggedIn);
 		if (isLoggedIn) {
-			console.log("User is logged in, navigating to profile");
 			navigate("/profile");
 		}
 	}, [isLoggedIn, navigate]);
@@ -25,14 +23,12 @@ function Login() {
 		e.preventDefault();
 		setLoading(true);
 		try {
-		console.log("Attempting login...");
 		const res = await axios.post(
 			import.meta.env.VITE_API_URL+"/api/users/login",
 			{ email, password },
 			{ withCredentials: true }
 		);
 		if (res.status === 200) {
-			console.log("Login successful, updating auth state");
 			login();
 			// Don't check for cookie, just navigate
 			navigate("/profile");
