@@ -46,9 +46,16 @@ function App() {
 		};
 		
 		checkAuth();
-		// Check auth again whenever route changes
-		window.addEventListener('storage', checkAuth);
-		return () => window.removeEventListener('storage', checkAuth);
+		
+		// Check auth again whenever storage event is triggered
+		const handleStorageEvent = (e) => {
+			if (e.key === 'auth-state') {
+				checkAuth();
+			}
+		};
+		
+		window.addEventListener('storage', handleStorageEvent);
+		return () => window.removeEventListener('storage', handleStorageEvent);
 	}, []);
 
 	return (

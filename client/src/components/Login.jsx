@@ -29,8 +29,8 @@ function Login() {
 			{ withCredentials: true }
 		);
 		if (res.status === 200) {
+			// The cookie is set by the server
 			login();
-			// Don't check for cookie, just navigate
 			navigate("/profile");
 		}
 		} catch (err) {

@@ -65,7 +65,7 @@ const loginUser = async (req, res) => {
 
 		// Set secure cookie with proper options
 		res.cookie("jwt", token, {
-			httpOnly: process.env.NODE_ENV === 'production', // httpOnly in production
+			httpOnly: true, // Always httpOnly for security
 			expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
 			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
 			secure: process.env.NODE_ENV === 'production', // secure in production
